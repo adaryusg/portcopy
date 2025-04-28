@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaryus R. Gillum - Portfolio Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Base and Font --- */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0c12;
+            color: #e5e7eb;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* --- Color Palette (Vivid Red Focus) --- */
+        :root {
+            --color-red-vivid: #FF1A1A;
+            --color-red-light: #FF4D4D;
+            --color-red-dark: #CC0000;
+            --color-white: #FFFFFF;
+            --color-off-white: #F9FAFB;
+            --color-bg-primary: #0a0c12;
+            --color-bg-secondary: #11131f; /* Solid Sidebar BG */
+            --color-bg-card: #161a2b;
+            --color-border: #4b5563; /* gray-600 */
+            --color-text-primary: #e5e7eb; /* gray-200 */
+            --color-text-secondary: #9ca3af; /* gray-400 */
+            --color-text-muted: #6b7280; /* gray-500 */
+        }
+
+        /* --- Animations --- */
+        @keyframes text-shimmer-rwr {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+        .animate-text-shimmer {
+            background-image: linear-gradient(to right, var(--color-red-light), var(--color-white), var(--color-red-vivid), var(--color-white), var(--color-red-light));
+            background-size: 250% auto;
+            color: transparent;
+            background-clip: text;
+            -webkit-background-clip: text;
+            animation: text-shimmer-rwr 5s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes red-border-glow {
+            0%, 100% { border-color: var(--color-red); box-shadow: 0 0 10px 2px rgba(255, 26, 26, 0.5); }
+            50%      { border-color: var(--color-red-light); box-shadow: 0 0 15px 3px rgba(255, 77, 77, 0.7); }
+        }
+        .animate-red-border:hover,
+        .sidebar-item.active {
+            animation: red-border-glow 2s ease-in-out infinite;
+            border-width: 1px !important;
+            border-color: transparent !important;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.6s ease-out forwards;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 26, 26, 0.4); }
+            50% { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(255, 26, 26, 0); }
+        }
+        .timeline-dot-group:hover .timeline-dot {
+             animation: pulse-red 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* --- UTILITIES & STYLING --- */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--color-bg-secondary); }
+        ::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--color-red-dark); }
+
+         details > summary { list-style: none; cursor: pointer; }
+         details > summary::-webkit-details-marker { display: none; }
+         details > summary::before {
+             content: '►'; font-size: 0.7em; margin-right: 5px; color: var(--color-red-light);
+             display: inline-block; transition: transform 0.2s ease-in-out; vertical-align: middle;
+         }
+         details[open] > summary::before { transform: rotate(90deg); }
+
+         .base-card {
+             background-color: rgba(22, 26, 43, 0.85);
+             backdrop-filter: blur(6px);
+             border-radius: 0.75rem;
+             padding: 1.25rem;
+             transition: all 0.3s ease-out;
+             border: 1px solid var(--color-border);
+             position: relative;
+             z-index: 5;
+         }
+         .base-card:hover:not(.animate-red-border) {
+             transform: translateY(-4px) scale(1.015);
+             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+             border-color: var(--color-red-light);
+         }
+         .tool-card { padding: 0.75rem; }
+         .references-card { background-color: rgba(17, 19, 31, 0.7); }
+
+         .quick-action-button {
+             transition: all 0.3s ease-out; box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+             border-radius: 0.5rem; padding: 0.6rem 1.2rem; font-weight: 600;
+             display: inline-flex; align-items: center; gap: 0.5rem;
+             color: var(--color-white); border: 1px solid transparent;
+         }
+         .quick-action-button:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 5px 10px rgba(0,0,0,0.4); }
+         .btn-main-action { background-image: linear-gradient(to right, var(--color-red), var(--color-red-light)); border-color: var(--color-red-dark); }
+         .btn-main-action:hover { background-image: linear-gradient(to right, var(--color-red-dark), var(--color-red)); box-shadow: 0 0 15px rgba(255, 26, 26, 0.5); }
+         .btn-secondary-action { background-color: var(--color-bg-card); border: 1px solid var(--color-red); color: var(--color-red-light); }
+         .btn-secondary-action:hover { background-color: rgba(229, 62, 62, 0.1); border-color: var(--color-red-light); color: var(--color-white); box-shadow: 0 0 10px rgba(229, 62, 62, 0.3); }
+         .btn-muted { background-color: #374151; color: var(--color-text-muted); cursor: not-allowed; opacity: 0.7; }
+         .btn-muted:hover { transform: none; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+
+         .section-header {
+             display: flex; align-items: center; gap: 0.75rem;
+             font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem;
+             padding-bottom: 0.75rem; border-bottom: 1px solid var(--color-border);
+             letter-spacing: 0.5px; color: var(--color-off-white);
+         }
+         .section-header svg { width: 24px; height: 24px; flex-shrink: 0; }
+         #education-section .section-header svg { color: var(--color-red-light); }
+         #certifications-section .section-header svg { color: var(--color-white); }
+         #skills-section .section-header svg { color: var(--color-red); }
+         #experience-section .section-header svg { color: var(--color-red-light); }
+         #projects-section .section-header svg { color: var(--color-white); }
+         #timeline-section .section-header svg { color: var(--color-red); }
+         #contact-section .section-header { color: var(--color-text-secondary); }
+         #contact-section .section-header svg { color: var(--color-text-secondary); }
+
+         .timeline-item-container { position: relative; padding-left: 1.75rem; margin-bottom: 1.75rem; }
+         .timeline-line { position: absolute; left: 5px; top: 6px; bottom: -6px; width: 2px; background-color: var(--color-border); }
+         .timeline-dot-group { position: absolute; left: -5px; top: 4px; }
+         .timeline-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--color-bg-secondary); transition: transform 0.2s ease-out; }
+         #timeline-content[data-timeline-type="Experience"] .timeline-dot { background-color: var(--color-red); }
+         #timeline-content[data-timeline-type="Education"] .timeline-dot { background-color: var(--color-red-light); }
+         #timeline-content[data-timeline-type="Certifications"] .timeline-dot { background-color: var(--color-white); }
+         .timeline-icon-container { position: absolute; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; left: -10px; top: 0px; ring: 4px; ring-offset-color: var(--color-bg-secondary); opacity: 0; transition: opacity 0.3s ease-in-out; }
+         .timeline-item-container:hover .timeline-icon-container { opacity: 1; }
+         #timeline-content[data-timeline-type="Experience"] .timeline-icon-container { background-color: rgba(229, 62, 62, 0.2); }
+         #timeline-content[data-timeline-type="Education"] .timeline-icon-container { background-color: rgba(255, 77, 77, 0.2); }
+         #timeline-content[data-timeline-type="Certifications"] .timeline-icon-container { background-color: rgba(255, 255, 255, 0.1); }
+
+         .timeline-tab.active { font-weight: 600; }
+         button[data-timeline="Experience"].active { border-color: var(--color-red); color: var(--color-red); }
+         button[data-timeline="Education"].active { border-color: var(--color-red-light); color: var(--color-red-light); }
+         button[data-timeline="Certifications"].active { border-color: var(--color-white); color: var(--color-white); }
+
+         .skill-tag {
+             background-color: rgba(55, 65, 81, 0.5); border: 1px solid var(--color-border);
+             color: var(--color-text-secondary); font-size: 0.75rem; font-weight: 500;
+             padding: 0.25rem 0.75rem; border-radius: 9999px;
+             transition: all 0.2s ease-out; cursor: default;
+         }
+         .skill-tag:hover {
+             transform: scale(1.05); border-color: var(--color-red);
+             box-shadow: 0 0 6px rgba(229, 62, 62, 0.4);
+             background-color: rgba(229, 62, 62, 0.1); color: var(--color-red-light);
+         }
+
+         .tool-card { border: 1px solid var(--color-border); }
+         .tool-card:hover { border-color: var(--color-red-light); box-shadow: 0 0 8px rgba(255, 77, 77, 0.3); }
+         .tool-card p:first-child { color: var(--color-off-white); }
+         .tool-card p:last-child { color: var(--color-red-light); }
+
+         .sidebar-item { color: var(--color-text-secondary); transition: all 0.2s ease-in-out; }
+         .sidebar-item:hover:not(.active) { background-color: rgba(55, 65, 81, 0.3); color: var(--color-red-light); }
+         .sidebar-item.active {
+             background-color: rgba(229, 62, 62, 0.1);
+             color: var(--color-red-light);
+             font-weight: 600;
+             /* Animation applied via class */
+         }
+
+         h2, h3, h4 { color: var(--color-off-white); }
+         p, li, span, time, summary { color: var(--color-text-primary); }
+         p.text-color-text-secondary, time.text-color-text-secondary, span.text-color-text-secondary { color: var(--color-text-secondary); }
+         p.text-color-text-muted, span.text-color-text-muted { color: var(--color-text-muted); }
+
+         main { background-color: var(--color-bg-primary); position: relative; z-index: 1; }
+
+    </style>
+    </head>
+<body class="font-inter">
+
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#11131f] opacity-100 p-4 md:p-6 flex-shrink-0 border-r border-color-border/30 transition-transform duration-300 ease-in-out md:translate-x-0 -translate-x-full shadow-2xl">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-lg md:text-xl font-bold text-red-500 tracking-wider uppercase">Adaryus Gillum</h1>
+            <button id="close-sidebar-btn" class="md:hidden text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        </div>
+        <nav class="space-y-3" id="sidebar-nav">
+             <button data-section="overview" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                 <span class="text-sm font-medium truncate">Overview</span>
+             </button>
+             <button data-section="education" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg>
+                <span class="text-sm font-medium truncate">Education</span>
+             </button>
+             <button data-section="certifications" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                <span class="text-sm font-medium truncate">Certifications</span>
+             </button>
+             <button data-section="skills" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                <span class="text-sm font-medium truncate">Skills & Tools</span>
+             </button>
+             <button data-section="experience" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                <span class="text-sm font-medium truncate">Experience</span>
+             </button>
+             <button data-section="projects" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                <span class="text-sm font-medium truncate">Featured Projects</span>
+             </button>
+             <button data-section="timeline" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"></line><path d="M5 18v-4"></path><path d="M9 18v-8"></path><path d="M13 18v-12"></path><path d="M17 18V6"></path><path d="M21 18v-2"></path></svg>
+                <span class="text-sm font-medium truncate">Career Timeline</span>
+             </button>
+             <button data-section="contact" class="sidebar-item w-full flex items-center space-x-3 cursor-pointer p-2 rounded-md text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                <span class="text-sm font-medium truncate">Contact & Resume</span>
+             </button>
+        </nav>
+    </aside>
+
+    <main class="relative flex-1 p-4 md:p-8 md:pl-72 overflow-auto space-y-10 bg-color-bg-primary">
+        <div class="md:hidden flex justify-between items-center mb-4 sticky top-0 bg-color-bg-primary/90 backdrop-blur-sm py-2 z-20 px-4 -mx-4 border-b border-color-border/50">
+            <h1 class="text-lg font-bold text-red-500 uppercase">Adaryus Gillum</h1>
+            <button id="open-sidebar-btn" class="text-gray-400 hover:text-white p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="content-container">
+            <section id="overview-section" class="content-section space-y-8 animate-fade-in">
+                <div class="base-card bg-gradient-to-br from-color-bg-card/90 via-color-bg-secondary/70 to-color-bg-card/90 !border-red-500/30 shadow-xl">
+                    <div class="text-center md:text-left space-y-2 mb-6">
+                        <h2 class="text-3xl md:text-4xl font-bold animate-text-shimmer">Adaryus R. Gillum</h2>
+                        <p class="text-base md:text-lg text-color-text-secondary font-medium">Digital Strategy | Social Media Management | AI-Driven Marketing Innovation</p>
+                        <div class="flex flex-wrap justify-center md:justify-start items-center gap-x-4 gap-y-1 text-sm text-color-text-secondary pt-1">
+                           <span class="inline-flex items-center whitespace-nowrap"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 text-red-400"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg> adaryus@mail.com</span>
+                           <span class="inline-flex items-center whitespace-nowrap"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 text-red-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> (304) 290-7713</span>
+                           <span class="inline-flex items-center whitespace-nowrap"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 text-red-400"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> Morgantown, WV</span>
+                           <a href="https://linkedin.com/in/adaryus" target="_blank" rel="noopener noreferrer" class="inline-flex items-center hover:text-red-400 transition-colors whitespace-nowrap">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1.5 text-red-400"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> linkedin.com/in/adaryus
+                            </a>
+                        </div>
+                    </div>
+                    <p class="text-sm md:text-base text-color-text-primary leading-relaxed">A results-driven Digital Strategist and future M.S. in AI Marketing graduate passionate about merging marketing psychology with cutting-edge AI technologies. My background spans integrated marketing communications, AI-driven audience research, digital content strategy, and social media campaign development. Certified across major platforms including LinkedIn, Google, HubSpot, Apple, and Hootsuite, I combine industry-recognized training with hands-on consulting, research, and content optimization experience. With a proven ability to translate marketing insights into innovative, AI-enhanced strategies, I am ready to drive digital engagement, scale brand growth, and lead marketing innovation into the next generation.</p>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="info-card base-card animate-red-border">
+                        <div class="mb-2 text-red-400"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg></div>
+                        <h3 class="text-base font-semibold mb-2 text-red-400">Education Snapshot</h3>
+                        <div class="text-color-text-secondary text-xs space-y-1"> <p>B.S. Integrated Marketing Comm. (WVU, Exp. 2025)</p> <p>M.S. AI Marketing (WVU, Starting Fall 2025)</p> </div>
+                    </div>
+                     <div class="info-card base-card animate-red-border">
+                         <div class="mb-2 text-white"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg></div>
+                         <h3 class="text-base font-semibold mb-2 text-white">Core Skills Focus</h3>
+                         <div class="text-color-text-secondary text-xs space-y-1"> <p>Digital Strategy, AI Marketing, Social Media</p> <p>SEO/Analytics, Drone Imaging</p> </div>
+                     </div>
+                     <div class="info-card base-card animate-red-border">
+                         <div class="mb-2 text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg></div>
+                         <h3 class="text-base font-semibold mb-2 text-red-500">Recent Experience</h3>
+                         <div class="text-color-text-secondary text-xs space-y-1"> <p>Undergrad Research Apprentice (WVU, 2024-25)</p> <p>Drone Pilot / Founder (Elevated Imaging, 2021-Pres)</p> </div>
+                     </div>
+                </div>
+                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                     <div class="base-card bg-color-bg-card/60 p-4 !border-color-border flex items-start space-x-3 hover:!border-red-500/50">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-red-400 mt-0.5"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+                         <div> <h4 class="text-sm font-semibold text-color-off-white">Career Objective</h4> <p class="text-xs text-color-text-secondary">Drive digital brand growth through AI-enhanced strategies and data-driven insights.</p> </div>
+                     </div>
+                     <div class="base-card bg-color-bg-card/60 p-4 !border-color-border flex items-start space-x-3 hover:!border-red-500/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-red-500 mt-0.5"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                         <div> <h4 class="text-sm font-semibold text-color-off-white">Key Expertise</h4> <p class="text-xs text-color-text-secondary">Digital Strategy, AI Marketing Integration, Social Media Management, SEO/Analytics.</p> </div>
+                     </div>
+                     <div class="base-card bg-color-bg-card/60 p-4 !border-color-border flex items-start space-x-3 hover:!border-red-400/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-red-400 mt-0.5"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg>
+                         <div> <h4 class="text-sm font-semibold text-color-off-white">Current Learning</h4> <p class="text-xs text-color-text-secondary">Pursuing M.S. in AI Marketing (WVU Chambers College, Fall 2025).</p> </div>
+                     </div>
+                     <div class="base-card bg-color-bg-card/60 p-4 !border-color-border flex items-start space-x-3 hover:!border-white/50">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 text-white mt-0.5"><line x1="3" y1="21" x2="21" y2="21"></line><path d="M5 18v-4"></path><path d="M9 18v-8"></path><path d="M13 18v-12"></path><path d="M17 18V6"></path><path d="M21 18v-2"></path></svg>
+                         <div> <h4 class="text-sm font-semibold text-color-off-white">Future Focus</h4> <p class="text-xs text-color-text-secondary">AI-Integrated CRM, Advanced Audience Behavior Research, Brand Innovation.</p> </div>
+                     </div>
+                </div>
+                 <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4">
+                   <a href="/Adaryus_Gillum_Resume.pdf" download="Adaryus_Gillum_Resume.pdf" class="quick-action-button btn-main-action">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Resume
+                   </a>
+                   <a href="https://linkedin.com/in/adaryus" target="_blank" rel="noopener noreferrer" class="quick-action-button btn-secondary-action">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn Profile
+                   </a>
+                   <button class="quick-action-button btn-muted" title="Coming Soon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg> Portfolio Site (Soon)
+                   </button>
+                </div>
+            </section>
+
+            <section id="education-section" class="content-section hidden space-y-6 animate-fade-in">
+                <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg> Education </h2>
+                 <div class="grid grid-cols-1 gap-6">
+                     <div class="info-card base-card animate-red-border">
+                         <h3 class="text-base font-semibold mb-2 text-red-400">Master of Science, Artificial Intelligence Marketing</h3>
+                         <div class="text-color-text-secondary text-xs space-y-1"> <p class="font-medium text-color-text-primary">West Virginia University – John Chambers College of Business and Economics</p> <p>Starting Fall 2025 – Expected 2027 | Morgantown, WV (Online – AACSB Accredited)</p> <p class="mt-2 text-sm text-color-text-primary">Prepares professionals to lead at the intersection of marketing and AI...</p> <p class="mt-2">Format: Fully Online (Asynchronous), 10 Courses / 30 Credits, 1–2 years</p>
+                            <details class="mt-2 cursor-pointer group"> <summary class="text-red-400 hover:underline font-medium group-open:mb-1 text-xs">Key Learning Outcomes</summary> <ul class="list-disc pl-5 mt-1 space-y-0.5 text-color-text-secondary text-xs"> <li>Demonstrate AI applications...</li><li>Adopt AI technology...</li><li>Use AI to describe consumer behavior...</li><li>Apply AI technology in CRM...</li><li>Use AI to develop marketing strategies...</li><li>Evaluate legal, ethical ramifications...</li> </ul> </details>
+                            <details class="mt-2 cursor-pointer group"> <summary class="text-red-400 hover:underline font-medium group-open:mb-1 text-xs">Curriculum Highlights</summary> <ul class="list-disc pl-5 mt-1 space-y-0.5 text-color-text-secondary text-xs"> <li>AI in Social Media...</li><li>AI-Driven Consumer Behavior...</li><li>AI-Enhanced Marketing Research...</li><li>Strategic Marketing Communications...</li><li>Ethical and Legal Aspects...</li><li>AI-Integrated CRM...</li><li>Capstone Project...</li> </ul> </details>
+                         </div>
+                     </div>
+                    <div class="info-card base-card animate-red-border">
+                         <h3 class="text-base font-semibold mb-2 text-red-400">Bachelor of Science, Integrated Marketing Communications</h3>
+                         <div class="text-color-text-secondary text-xs space-y-1"> <p class="font-medium text-color-text-primary">West Virginia University</p> <p>Expected Spring 2025 | Morgantown, WV | GPA: 3.05</p> <p class="mt-2 text-sm font-medium text-red-500">Activities:</p> <ul class="list-disc pl-5 text-color-text-secondary text-xs"> <li>Member, American Advertising Federation (AAF), WVU Chapter</li><li>Member, American Marketing Association (AMA), WVU Chapter</li> </ul>
+                            <details class="mt-2 cursor-pointer group"> <summary class="text-red-400 hover:underline font-medium group-open:mb-1 text-xs">Relevant Coursework (26)</summary> <ul class="list-disc pl-5 mt-1 space-y-0.5 text-color-text-secondary columns-1 sm:columns-2 md:columns-3 lg:columns-2 xl:columns-3 text-xs"> <li>Integrated Marketing Communications Principles (IMC 215)</li><li>Principles of Marketing (BCOR 350)</li><li>Audience Psychology and Behavior (ADPR 450)</li><li>Branded Content / Narrative (ADPR 438)</li><li>Advertising Copywriting (ADV 315S)</li><li>Social Media Applications (JRL 433)</li><li>Social Media Strategy (JRL 432)</li><li>Strategic Social Media Campaigns (JRL 434)</li><li>Media Planning and Strategy (ADV 403)</li><li>Media Ethics / Media Law (MDIA 328)</li><li>Audience Insights and Analysis (ADPR 421S)</li><li>Marketing Research (MKTG 325)</li><li>Media and Society (MDIA 101)</li><li>Media Writing (MDIA 215S)</li><li>Business Ethics (BCOR 380)</li><li>Market Research and Consumer Insights Analysis (SPSS, SAS)</li><li>Statistics</li><li>Applied Calculus</li><li>Economics</li><li>Principles of Accounting</li><li>Advertising Ethics & Compliance</li><li>Media Tools and Applications</li> </ul> </details>
+                         </div>
+                     </div>
+                </div>
+            </section>
+            <section id="certifications-section" class="content-section hidden space-y-6 animate-fade-in">
+                <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg> Certifications (12) </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Apple Search Ads Certification</h4> <p class="text-xs text-color-text-secondary">Issuer: Apple | Issued Jan 2025</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Google Analytics 4 Certification</h4> <p class="text-xs text-color-text-secondary">Issuer: Google | Issued Nov 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Hootsuite Platform Certification</h4> <p class="text-xs text-color-text-secondary">Issuer: Hootsuite | Issued Oct 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">SEO Certified (I & II)</h4> <p class="text-xs text-color-text-secondary">Issuer: HubSpot | Issued Oct 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Social Media Marketing I & II Certification</h4> <p class="text-xs text-color-text-secondary">Issuer: HubSpot | Issued Oct 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Negotiation Professional Certificate</h4> <p class="text-xs text-color-text-secondary">Issuer: American Negotiation Institute | Issued Aug 2024</p> <div class="flex flex-wrap gap-1 mt-1"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Professional Communication</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Strategic Negotiations</span> </div> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">LinkedIn Certified Marketing Insider</h4> <p class="text-xs text-color-text-secondary">Issuer: LinkedIn | Issued Jun 2024</p> <p class="text-[10px] text-color-text-muted">ID: p6cbpjgppzh6</p> <div class="flex flex-wrap gap-1 mt-1"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Social Media Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Business Analysis</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Legal Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Marketing</span> </div> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">LinkedIn Content and Creative Design</h4> <p class="text-xs text-color-text-secondary">Issuer: LinkedIn | Issued Jun 2024 · Expires Jun 2026</p> <p class="text-[10px] text-color-text-muted">ID: 4ubpv4eiz6ky</p> <div class="flex flex-wrap gap-1 mt-1"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Social Media Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Business Analysis</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Photography</span> </div> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">LinkedIn Marketing Solutions Fundamentals</h4> <p class="text-xs text-color-text-secondary">Issuer: LinkedIn | Issued Jun 2024 · Expires Jun 2026</p> <p class="text-[10px] text-color-text-muted">ID: xphh4noc9sy7</p> <div class="flex flex-wrap gap-1 mt-1"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Social Media Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Business Analysis</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Marketing</span> </div> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">LinkedIn Marketing Strategy</h4> <p class="text-xs text-color-text-secondary">Issuer: LinkedIn | Issued Jun 2024 · Expires Jun 2026</p> <p class="text-[10px] text-color-text-muted">ID: hrhkxarbdby4</p> <div class="flex flex-wrap gap-1 mt-1"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Social Media Marketing</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Business Analysis</span> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Marketing</span> </div> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">Remote Piloted Aircraft Systems Pilot License</h4> <p class="text-xs text-color-text-secondary">Issuer: Transport Canada | Issued Feb 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                     <div class="cert-card base-card animate-red-border flex flex-col justify-between min-h-[130px]"> <div> <h4 class="font-semibold text-sm text-color-off-white">FAA Part 107 Drone License</h4> <p class="text-xs text-color-text-secondary">Issuer: FAA | Renewed Mar 2024</p> </div> <span class="text-xs text-color-text-muted mt-1 self-start italic">(Credential link unavailable)</span> </div>
+                </div>
+            </section>
+            <section id="skills-section" class="content-section hidden space-y-8 animate-fade-in">
+                 <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg> Skills & Tools </h2>
+                 <div>
+                     <h3 class="text-lg font-semibold mb-4 text-color-text-secondary">Core Competencies</h3>
+                     <div class="flex flex-wrap gap-2"> <span class="skill-tag">Digital Strategy Development & Execution</span> <span class="skill-tag">AI-Enhanced Marketing Research & Insights</span> <span class="skill-tag">SEO/SEM Analytics and Content Optimization</span> <span class="skill-tag">Strategic Social Media Management & Planning</span> <span class="skill-tag">Paid Media Campaign Management (Google Ads, Facebook Ads, LinkedIn Ads)</span> <span class="skill-tag">CRM Systems (HubSpot, Salesforce)</span> <span class="skill-tag">Drone Surveying, Imaging, 3D Mapping (Pix4D, DroneDeploy)</span> <span class="skill-tag">AI Tools for Content Strategy (ChatGPT, Jasper)</span> <span class="skill-tag">Audience Behavior Analysis & Psychology</span> <span class="skill-tag">Brand Development & Growth Strategy</span> <span class="skill-tag">Content Strategy & Planning</span> <span class="skill-tag">Marketing Research</span> <span class="skill-tag">Digital Growth Roadmapping</span> <span class="skill-tag">AI Tool Integration for Marketing</span> <span class="skill-tag">Crisis Communication Management</span> <span class="skill-tag">SEO/SEM Auditing</span> <span class="skill-tag">Media Planning</span> <span class="skill-tag">Abstract Writing</span> <span class="skill-tag">Data Visualization</span> </div>
+                 </div>
+                  <div>
+                     <h3 class="text-lg font-semibold mb-4 text-color-text-secondary">Platforms & Tools</h3>
+                      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Google Analytics 4">Google Analytics 4</p> <p class="text-xs truncate" title="SEO & Campaign Analytics">SEO & Campaign Analytics</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Hootsuite">Hootsuite</p> <p class="text-xs truncate" title="Social Media Management">Social Media Management</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="WordPress">WordPress</p> <p class="text-xs truncate" title="Content Management">Content Management</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Facebook Ads / Google Ads">Facebook Ads / Google Ads</p> <p class="text-xs truncate" title="Paid Media Campaigns">Paid Media Campaigns</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Talkwalker / Brandwatch">Talkwalker / Brandwatch</p> <p class="text-xs truncate" title="Social Listening & Analytics">Social Listening & Analytics</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Pix4D / DroneDeploy">Pix4D / DroneDeploy</p> <p class="text-xs truncate" title="Drone Survey & Imaging">Drone Survey & Imaging</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="HubSpot CRM">HubSpot CRM</p> <p class="text-xs truncate" title="Marketing Automation & CRM">Marketing Automation & CRM</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="ChatGPT / Jasper">ChatGPT / Jasper</p> <p class="text-xs truncate" title="AI Content Creation & Strategy">AI Content Creation & Strategy</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="Adobe Creative Suite">Adobe Creative Suite</p> <p class="text-xs truncate" title="Content Creation & Editing">Content Creation & Editing</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="SPSS / SAS">SPSS / SAS</p> <p class="text-xs truncate" title="Statistical Analysis">Statistical Analysis</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="LiDAR Software">LiDAR Software</p> <p class="text-xs truncate" title="3D Data Collection">3D Data Collection</p> </div>
+                         <div class="tool-card base-card"> <p class="font-medium text-sm truncate" title="AR/VR Development Tools">AR/VR Development Tools</p> <p class="text-xs truncate" title="Model Integration">Model Integration</p> </div>
+                     </div>
+                 </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                    <div> <h3 class="text-lg font-semibold mb-2 text-color-text-secondary">Languages</h3> <span class="skill-tag">English (Fluent)</span> </div>
+                     <div> <h3 class="text-lg font-semibold mb-2 text-color-text-secondary">Interests & Hobbies</h3> <div class="flex flex-wrap gap-2"> <span class="skill-tag">Creative Strategy</span> <span class="skill-tag">Drone Innovation</span> <span class="skill-tag">Market Research</span> <span class="skill-tag">Business Consulting</span> </div> </div>
+                 </div>
+             </section>
+            <section id="experience-section" class="content-section hidden space-y-6 animate-fade-in">
+                <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg> Professional Experience </h2>
+                <div class="space-y-6">
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Undergraduate Research Apprentice</h3> <p class="text-sm text-red-400 font-medium">West Virginia University</p> <p class="text-xs text-color-text-secondary mb-2">Jan 2024 – Dec 2024 | Hybrid</p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Utilized drones, LiDAR...</li> <li>Applied mathematical models...</li> <li>Conducted research tasks...</li> <li>Selected for apprenticeship...</li> </ul> <div class="flex flex-wrap gap-1.5 mt-3"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Drone-based 3D data collection</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">AR/VR research</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Abstract writing</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Data visualization</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">LiDAR</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Sensing Technologies</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Mathematical Modeling</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Research Skills</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">GIS</span> </div> </div>
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Founder / Drone Pilot & Aerial Imaging Specialist</h3> <p class="text-sm text-red-400 font-medium">Elevated Imaging LLC | Zeitview | CBRE | Site Technologies</p> <p class="text-xs text-color-text-secondary mb-2">Jan 2021 – Present </p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Founded and operated...</li> <li>Completed over 250 hours...</li> <li>Delivered drone surveying...</li> <li>Licensed Drone Pilot...</li> <li>Handled full-cycle service...</li> <li>Worked closely with clients...</li> </ul> <div class="flex flex-wrap gap-1.5 mt-3"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Drone Operation</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Aerial Photography</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Videography</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">LiDAR</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">3D Mapping</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Surveying</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Pix4D</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">DroneDeploy</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Client Relations</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Business Development</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Entrepreneurship</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">FAA Part 107</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Transport Canada RPAS</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">CAD</span> </div> </div>
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Graduation Photographer</h3> <p class="text-sm text-red-400 font-medium">Balfour & Co.</p> <p class="text-xs text-color-text-secondary mb-2">Oct 2021 – Present | Hybrid</p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Photographed over 16,000 graduates...</li> <li>Adjusted to varying event environments...</li> <li>Collaborated with staff...</li> <li>Specialized in capturing milestone events...</li> </ul> <div class="flex flex-wrap gap-1.5 mt-3"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Event Photography</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">High-Volume Photography</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Portrait Photography</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Camera Operation</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Lighting Adjustment</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Client Interaction</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Team Collaboration</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Adaptability</span> </div> </div>
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Media Consultant</h3> <p class="text-sm text-red-400 font-medium">Prospect & Price Creative</p> <p class="text-xs text-color-text-secondary mb-2">Aug 2023 – May 2024 </p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Designed and executed integrated marketing plans...</li> <li>Managed campaign execution...</li> <li>Handled budget management...</li> </ul> <div class="flex flex-wrap gap-1.5 mt-3"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Integrated Marketing Communications (IMC)</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Social Media Strategy</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Digital Marketing</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Content Planning</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Campaign Management</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Market Research</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Performance Reporting</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Client Management</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Budget Management</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">KPI Tracking</span> </div> </div>
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Lab Research Assistant</h3> <p class="text-sm text-red-400 font-medium">Mountaineer Green Ventures</p> <p class="text-xs text-color-text-secondary mb-2">Jul 2019 – Aug 2021 | On-site</p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Monitored and optimized extraction yields...</li> <li>Developed and tested formulations...</li> <li>Maintained comprehensive records...</li> <li>Conducted A/B testing...</li> <li>Implemented rigorous quality control...</li> </ul> <div class="flex flex-wrap gap-1.5 mt-3"> <span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Laboratory Research</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Data Collection & Analysis</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Quantitative & Qualitative Analysis</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">A/B Testing</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Quality Control</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Process Optimization</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Record Keeping</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Formulation Development</span><span class="text-[10px] bg-red-800/50 text-red-300 px-1.5 py-0.5 rounded">Experimental Design</span> </div> </div>
+                    <div class="exp-card base-card animate-red-border"> <h3 class="text-base font-semibold text-color-off-white">Marketing Insider</h3> <p class="text-sm text-red-400 font-medium">LinkedIn</p> <p class="text-xs text-color-text-secondary mb-2">Jun 2024 - Present </p> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 pl-2"> <li>Actively participating in LinkedIn's Marketing Insider program, gaining insights into latest marketing trends and platform features.</li> </ul> </div>
+                </div>
+            </section>
+            <section id="projects-section" class="content-section hidden space-y-6 animate-fade-in">
+                 <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg> Featured Projects (24) </h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Audience Psychology Analysis (Veganuary)</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Analyzed psychological factors...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">AI Tools for Strategic Audience Research</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Explored and applied AI tools...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Noise Reduction in COVID-19 Health Campaigns</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Investigated strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Organizational Communication Study: Amazon’s RTO Policy</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Analyzed communication strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Nike Traditional Media Advertising Analysis</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Evaluated effectiveness...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Confirmation Bias and Audience Targeting Strategies</h4> <p class="text-[11px] text-color-text-secondary">Audience Behavior & Psychology (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Examined confirmation bias...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Digital Goals and Brand Alignment (Nike Case Study)</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Analyzed Nike's digital strategy...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Government Efficiency Website & Social Media Integration</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Proposed strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Podcast Launch Plan: “Sneaker Stories” for WV Kicks</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Developed a launch plan...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Virtual Reality and Immersive Technology Impact Report</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Assessed potential impact...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Harley-Davidson Social Media Expansion Plan</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Developed a strategic plan...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Designing and Evaluating Social Media Metrics</h4> <p class="text-[11px] text-color-text-secondary">Social Media Strategy (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Focused on creation and evaluation...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Carnival Cruise Crisis Communication Strategy</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Developed a crisis plan...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Content and Engagement Study: The Shade Room</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Analyzed content strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">U.S. Dept. of Education Microblogging Analysis</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Analyzed microblogging strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">American Red Cross Social Media Strategy</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Designed integrated strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Nike Super Bowl Multi-Screen Engagement Plan</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Developed multi-screen plan...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Social Media Strategy for MK Airsoft Clarksburg</h4> <p class="text-[11px] text-color-text-secondary">Social Media Applications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Created a tailored strategy...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">IMC Campaign: WV Kicks</h4> <p class="text-[11px] text-color-text-secondary">Integrated Marketing Communications (Course Project)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Campaign Introduction...</li><li>Creative Brief...</li><li>Development of 'Every Sneaker...'</li><li>Multi-Platform Ad Concepts...</li><li>PR, Influencer Marketing...</li><li>Final IMC Proposal.</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Market Dynamics and Consumer Insights Analysis</h4> <p class="text-[11px] text-color-text-secondary">Marketing Research (Jan 2024 - Apr 2024)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Utilized SPSS/SAS...</li><li>Interpreted trends...</li><li>Developed reports...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Digital Content Optimization & Social Media Mgmt</h4> <p class="text-[11px] text-color-text-secondary">Content Strategy / Social Media (Jan 2024 - Apr 2024)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Performed content audits & SEO...</li><li>Managed social media...</li><li>Developed content strategies...</li> </ul> </div>
+                     <div class="project-card base-card animate-red-border flex flex-col"> <div> <h4 class="font-semibold text-sm text-red-400">Ethical Advertising & Media Law Compliance</h4> <p class="text-[11px] text-color-text-secondary">Media Ethics & Law (Jan 2024 - Apr 2024)</p> </div> <ul class="list-disc list-inside text-xs text-color-text-secondary space-y-1 mt-2 flex-grow"> <li>Researched regulations...</li><li>Developed strategies...</li><li>Provided insights...</li> </ul> </div>
+                 </div>
+             </section>
+            <section id="timeline-section" class="content-section hidden space-y-8 animate-fade-in">
+                <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="21" x2="21" y2="21"></line><path d="M5 18v-4"></path><path d="M9 18v-8"></path><path d="M13 18v-12"></path><path d="M17 18V6"></path><path d="M21 18v-2"></path></svg> Career Timeline </h2>
+                <div class="flex space-x-1 sm:space-x-4 border-b border-color-border mb-6 overflow-x-auto pb-2">
+                    <button data-timeline="Experience" class="timeline-tab py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap">Experience</button>
+                    <button data-timeline="Education" class="timeline-tab py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap">Education</button>
+                    <button data-timeline="Certifications" class="timeline-tab py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium transition-colors duration-200 whitespace-nowrap">Certifications</button>
+                </div>
+                <div class="relative"> <div class="timeline-line"></div> <ol id="timeline-content" data-timeline-type="Experience"> {/* Populated by JS */} </ol> </div>
+            </section>
+            <section id="contact-section" class="content-section hidden space-y-8 animate-fade-in">
+                 <h2 class="section-header animate-text-shimmer"> <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg> Contact & Resume </h2>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="contact-card base-card space-y-4">
+                        <p class="flex items-center gap-3 text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400 flex-shrink-0"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg> <span class="text-color-text-primary break-all">adaryus@mail.com</span></p>
+                        <p class="flex items-center gap-3 text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400 flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> <span class="text-color-text-primary">(304) 290-7713</span></p>
+                        <p class="flex items-center gap-3 text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg> <span class="text-color-text-primary">Morgantown, WV</span></p>
+                       <p class="flex items-center gap-3 text-sm"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-400 flex-shrink-0"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> <a href="https://linkedin.com/in/adaryus" target="_blank" rel="noopener noreferrer" class="text-color-text-primary hover:text-red-400 hover:underline transition-colors break-all"> linkedin.com/in/adaryus </a> </p>
+                      <div class="pt-4"> <a href="/Adaryus_Gillum_Resume.pdf" download="Adaryus_Gillum_Resume.pdf" class="quick-action-button btn-main-action"> <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg> Download Full Resume (PDF) </a> </div>
+                  </div>
+                     <div class="references-card base-card space-y-2"> <h3 class="text-base font-semibold text-color-text-secondary">References</h3> <p class="text-xs text-color-text-secondary">Available upon request.</p> <p class="text-xs text-color-text-muted">(Dr. Fei Dai – Research Mentor, WVU | Dr. Steve Urbanski – Professor, WVU)</p> </div>
+                 </div>
+             </section>
+
+        </div> </main>
+
+    <script>
+        // --- Data (Condensed for JS Logic) ---
+        const experienceData = [ { dates: "Jan 2024 – Dec 2024", title: "Undergraduate Research Apprentice", subtitle: "West Virginia University", details: ["Utilized drones, LiDAR..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' }, { dates: "Jan 2021 – Present", title: "Founder / Drone Pilot & Aerial Imaging Specialist", subtitle: "Elevated Imaging LLC | Zeitview | CBRE | Site Technologies", details: ["Founded and operated..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' }, { dates: "Oct 2021 – Present", title: "Graduation Photographer", subtitle: "Balfour & Co.", details: ["Photographed over 16,000..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' }, { dates: "Aug 2023 – May 2024", title: "Media Consultant", subtitle: "Prospect & Price Creative", details: ["Designed and executed..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' }, { dates: "Jul 2019 – Aug 2021", title: "Lab Research Assistant", subtitle: "Mountaineer Green Ventures", details: ["Monitored and optimized..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' }, { dates: "Jun 2024 - Present", title: "Marketing Insider", subtitle: "LinkedIn", details: ["Actively participating..."], color: 'red', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>' } ].sort((a, b) => (b.dates.split('–')[0] || b.dates.split(' ')[2]) - (a.dates.split('–')[0] || a.dates.split(' ')[2]));
+        const educationData = [ { year: "Starting Fall 2025 – Expected 2027", title: "Master of Science, Artificial Intelligence Marketing", subtitle: "West Virginia University – John Chambers College...", color: "red", iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg>' }, { year: "Expected Spring 2025", title: "Bachelor of Science, Integrated Marketing Communications", subtitle: "West Virginia University", color: "red", iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.084a1 1 0 0 0 0 1.838l8.57 3.908a2 2 0 0 0 1.66 0l8.59-3.908Z"></path><path d="M6 12v5c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2v-5"></path><path d="M6 12.243 8.5 13.5 12 15l3.5-1.5L18 12.243"></path></svg>' } ];
+        const certificationData = [ { date: "Issued Jan 2025", title: "Apple Search Ads Certification", subtitle: "Apple" }, { date: "Issued Nov 2024", title: "Google Analytics 4 Certification", subtitle: "Google" }, { date: "Issued Oct 2024", title: "Hootsuite Platform Certification", subtitle: "Hootsuite" }, { date: "Issued Oct 2024", title: "SEO Certified (I & II)", subtitle: "HubSpot" }, { date: "Issued Oct 2024", title: "Social Media Marketing I & II Certification", subtitle: "HubSpot" }, { date: "Issued Aug 2024", title: "Negotiation Professional Certificate", subtitle: "American Negotiation Institute" }, { date: "Issued Jun 2024", title: "LinkedIn Certified Marketing Insider", subtitle: "LinkedIn" }, { date: "Issued Jun 2024 · Expires Jun 2026", title: "LinkedIn Content and Creative Design", subtitle: "LinkedIn" }, { date: "Issued Jun 2024 · Expires Jun 2026", title: "LinkedIn Marketing Solutions Fundamentals", subtitle: "LinkedIn" }, { date: "Issued Jun 2024 · Expires Jun 2026", title: "LinkedIn Marketing Strategy", subtitle: "LinkedIn" }, { date: "Issued Feb 2024", title: "Remote Piloted Aircraft Systems Pilot License", subtitle: "Transport Canada" }, { date: "Renewed Mar 2024", title: "FAA Part 107 Drone License", subtitle: "FAA" }, ].sort((a, b) => { const cleanDate = (d) => d.replace('Issued ', '').replace('Renewed ', '').replace(/· Expires.*/, ''); const dateA = new Date(cleanDate(a.date)); const dateB = new Date(cleanDate(b.date)); if (isNaN(dateA.getTime()) || isNaN(dateB.getTime())) return 0; return dateB.getTime() - dateA.getTime(); }).map(cert => ({ ...cert, year: cert.date, color: 'white', iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"></path><path d="m9 12 2 2 4-4"></path></svg>' }));
+
+        // --- DOM Elements & JS Logic ---
+        const sidebar = document.getElementById('sidebar');
+        const openSidebarBtn = document.getElementById('open-sidebar-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const contentContainer = document.getElementById('content-container');
+        const contentSections = contentContainer.querySelectorAll('.content-section');
+        const sidebarItems = sidebarNav.querySelectorAll('.sidebar-item');
+        const timelineTabs = document.querySelectorAll('.timeline-tab');
+        const timelineContent = document.getElementById('timeline-content');
+
+        function showSection(sectionId) {
+            contentSections.forEach(section => {
+                section.style.display = section.id === `${sectionId}-section` ? 'block' : 'none';
+            });
+            sidebarItems.forEach(item => {
+                const isActive = item.dataset.section === sectionId;
+                item.classList.toggle('active', isActive);
+                item.setAttribute('aria-current', isActive ? 'page' : 'false');
+            });
+            if (window.innerWidth < 768) { sidebar.classList.add('-translate-x-full'); }
+             const mainContentArea = document.querySelector('main');
+             if(mainContentArea) mainContentArea.scrollTop = 0;
+        }
+
+        function createTimelineItemHTML(item) {
+             const { year, title, subtitle, details, iconSVG, color } = item;
+             let dotColorClass = 'bg-gray-500';
+             let iconBgColorClass = 'bg-gray-800/50';
+             let yearBgColorClass = 'bg-gray-200';
+             let yearTextColorClass = 'text-gray-800';
+
+             if (color === 'red') { dotColorClass = 'bg-red-500'; iconBgColorClass = 'bg-red-900/50'; yearBgColorClass = 'bg-red-100'; yearTextColorClass = 'text-red-800'; }
+             else if (color === 'green') { dotColorClass = 'bg-red-400'; iconBgColorClass = 'bg-red-800/50'; yearBgColorClass = 'bg-red-100'; yearTextColorClass = 'text-red-800'; } // Edu uses light red
+             else if (color === 'white') { dotColorClass = 'bg-white'; iconBgColorClass = 'bg-gray-600/50'; yearBgColorClass = 'bg-gray-100'; yearTextColorClass = 'text-gray-800'; }
+
+            return `
+                <li class="timeline-item-container group">
+                    <div class="timeline-dot-group">
+                        <span class="timeline-dot ${dotColorClass}"></span>
+                        <span class="timeline-icon-container ${iconBgColorClass}"> ${iconSVG || ''} </span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="flex items-center mb-0.5 text-sm font-semibold text-color-off-white">
+                            ${title}
+                            ${year ? `<span class="${yearBgColorClass} ${yearTextColorClass} text-[10px] font-medium px-2 py-0.5 rounded ml-2">${year}</span>` : ''}
+                        </h3>
+                        ${subtitle ? `<time class="block mb-1 text-[11px] font-normal leading-none text-color-text-secondary">${subtitle}</time>` : ''}
+                        ${details && details.length > 0 ? `<div class="text-xs font-normal text-color-text-secondary space-y-1">${details.map(d => `<p>${d}</p>`).join('')}</div>` : ''}
+                    </div>
+                </li>`;
+        }
+
+        function renderTimeline(timelineType) {
+            let itemsToRender = [];
+            if (timelineType === 'Experience') itemsToRender = experienceData;
+            else if (timelineType === 'Education') itemsToRender = educationData;
+            else if (timelineType === 'Certifications') itemsToRender = certificationData;
+
+            timelineContent.innerHTML = itemsToRender.map(createTimelineItemHTML).join('');
+            timelineContent.dataset.timelineType = timelineType;
+
+            timelineTabs.forEach(tab => {
+                 tab.classList.toggle('active', tab.dataset.timeline === timelineType);
+                 tab.classList.remove('border-red-500', 'text-red-500', 'border-red-400', 'text-red-400', 'border-white', 'text-white', 'text-color-text-secondary', 'border-transparent');
+                 if (tab.dataset.timeline === timelineType) {
+                     if(timelineType === 'Experience') tab.classList.add('border-red-500', 'text-red-500');
+                     else if(timelineType === 'Education') tab.classList.add('border-red-400', 'text-red-400'); // Edu uses light red
+                     else if(timelineType === 'Certifications') tab.classList.add('border-white', 'text-white');
+                 } else {
+                     tab.classList.add('text-color-text-secondary', 'border-transparent', 'hover:text-red-400');
+                 }
+            });
+        }
+
+        sidebarNav.addEventListener('click', (event) => {
+            const button = event.target.closest('.sidebar-item');
+            if (button?.dataset.section) showSection(button.dataset.section);
+        });
+        openSidebarBtn.addEventListener('click', () => sidebar.classList.remove('-translate-x-full'));
+        closeSidebarBtn.addEventListener('click', () => sidebar.classList.add('-translate-x-full'));
+        timelineTabs.forEach(tab => {
+             tab.addEventListener('click', () => renderTimeline(tab.dataset.timeline));
+         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+             contentSections.forEach(section => {
+                 if (section.id !== 'overview-section') {
+                     section.classList.add('hidden');
+                 } else {
+                      section.classList.remove('hidden');
+                 }
+             });
+            showSection('overview');
+            renderTimeline('Experience');
+        });
+
+    </script>
+
+</body>
+</html>
